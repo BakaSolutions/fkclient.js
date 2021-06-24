@@ -1,0 +1,57 @@
+body {
+	margin: 0;
+	padding: 0;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Ubuntu", sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+code {
+	font-family: source-code-pro, Menlo, Monaco, Consolas, monospace;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+main {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1em;
+	width: 100vw;
+	height: 100vh;
+	padding: 1em;
+}
+
+#log {
+	height: 100%;
+	overflow-y: scroll;
+}
+
+.message {
+	padding: 1em;
+}
+
+.message.in {
+	border-left: 0.5em solid green;
+}
+
+.message.out {
+	border-left: 0.5em solid blue;
+}
+
+.widget {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	background-color: #f1f1f1;
+	padding: 0.5em;
+	margin: 0.25em;
+}
+
+.widget button {
+	grid-column: 2;
+}
+
+.widget input {
+	background-color: #f9f9f9;
+}
