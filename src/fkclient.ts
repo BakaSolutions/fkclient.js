@@ -1,6 +1,47 @@
 const wait = (delay: number) => new Promise(resolve => setTimeout(resolve, delay))
 
-type Listener = [Function: (arg0: object) => boolean, Function: (arg0: object) => any]
+export type Listener = [
+	Function: (arg0: InMessage | OutMessage) => boolean,
+	Function: (arg0: InMessage | OutMessage) => any
+]
+
+export type InMessage = {
+	what: {
+		request: string
+		name?: string
+		id?: number
+		threadId?: number
+		query?: string
+		boardName?: string
+		count?: number
+		page?: number
+		parameters?: object
+	},
+
+	data: {
+		ws?: string
+	}
+
+	error?: {
+		message?: string
+		description?: string
+		code?: string
+	}
+}
+
+export type OutMessage = {
+	request?: string
+	name?: string
+	id?: number
+	threadId?: number
+	query?: string
+	boardName?: string
+	count?: number
+	page?: number
+	parameters?: object
+
+	data?: object
+}
 
 export default class FKClient {
 	#APIServerURI: URL
@@ -12,15 +53,14 @@ export default class FKClient {
 	constructor(uri: string) {
 		this.#APIServerURI = new URL(uri)
 
-		this.#http("GET", "meta", null, 1e3).then((response: any) => {
-			this.#handleMessage({ what: { request: "meta" }, data: response })
-
-			if (response["ws"] === undefined) {
-				throw "API initialisation failed"
+		this.addListener((message) => {
+			return "what" in message && message.data?.ws !== undefined
+		}, (message) => {
+			this.#meta = { ...this.#meta, ...message.data }
+			if (this.#WSGate !== undefined) {
+				this.#WSGate.close()
 			}
-
-			this.#meta = { ...this.#meta, ...response }
-			this.#WSGate = new WebSocket(response["ws"])
+			this.#WSGate = new WebSocket((message as {data: {ws: string}}).data.ws)
 
 			this.#WSGate.onopen = () => this.#ready = true
 			this.#WSGate.onclose = () => this.#ready = false
@@ -30,6 +70,8 @@ export default class FKClient {
 				this.#handleMessage(JSON.parse(message.data))
 			})
 		})
+
+		this.readMeta()
 	}
 
 	get captchaImageURI() {
@@ -52,7 +94,7 @@ export default class FKClient {
 		return (this.#meta as { thumb?: string }).thumb || null
 	}
 
-	#handleMessage(data: object) {
+	#handleMessage(data: InMessage | OutMessage) {
 		this.#messageHandlers.forEach(([filter, callback]) => {
 			if (filter(data) === true) {
 				callback(data)
@@ -60,15 +102,15 @@ export default class FKClient {
 		})
 	}
 
-	addListener(filter: (arg0: object) => boolean, callback: (arg0: object) => any) {
+	addListener(filter: (arg0: InMessage | OutMessage) => boolean, callback: (arg0: InMessage | OutMessage) => any) {
 		this.#messageHandlers.push([filter, callback])
 	}
 
-	removeListener(filter: (arg0: object) => boolean) {
+	removeListener(filter: (arg0: InMessage | OutMessage) => boolean) {
 		this.#messageHandlers = this.#messageHandlers.filter((handler) => handler[0] !== filter)
 	}
 
-	#ws(req: object): void {
+	#ws(req: OutMessage): void {
 		let i = setInterval(() => {
 			this.#handleMessage(req)
 
@@ -112,6 +154,12 @@ export default class FKClient {
 				await wait(retryDelay)
 				return this.#http(method, path, body, retryDelay << 1)
 			})
+	}
+
+	readMeta() {
+		this.#http("GET", "meta", null, 1e3).then((response: any) => {
+			this.#handleMessage({ what: { request: "meta" }, data: response })
+		})
 	}
 
 	readManyBoards() {
