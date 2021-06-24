@@ -1,7 +1,7 @@
 import { useState } from "react"
 import FKClient from "@bakaso/fkclient"
-
 import Widget from "./Widget"
+import LogScreen from "./LogScreen"
 
 let client = undefined
 let counter = 0
@@ -12,8 +12,17 @@ export default function App() {
 	function readMeta(uri) {
 		if (client === undefined) {
 			try {
+				// Create an FKClient instance and tie it to a specific API address
 				client = new FKClient(uri)
-				client.addListener(() => true, data => setLog(log => [...log, { direction: data.what === undefined ? "out" : "in", id: counter++, message: data }]))
+
+				// Add message listeners
+				// The second parameter is a handler function, that decides what to do with the message
+				// The first parameter is a filter function, that decides if a message should be handled by the second parameter
+				// Here, the filter always returns true, hence all messages are handled by the provided handler
+				client.addListener(
+					() => true,
+					message => setLog(log => [...log, { direction: message.what === undefined ? "out" : "in", id: counter++, message }])
+				)
 			} catch { }
 		} else {
 			client.readMeta()
@@ -39,17 +48,7 @@ export default function App() {
 					<button onClick={() => client.readOneBoard(document.querySelector("[name='readOneBoard/name']").value)} disabled={client === undefined}>readOneBoard</button>
 				</Widget>
 			</div>
-			<div id="log">
-				{
-					log.map((element) => {
-						return (
-							<pre key={element.id} className={`message ${element.direction}`}>
-								{JSON.stringify(element.message, null, 4)}
-							</pre>
-						)
-					})
-				}
-			</div>
+			<LogScreen log={log} />
 		</>
 	)
 }
