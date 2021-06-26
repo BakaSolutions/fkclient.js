@@ -2,6 +2,7 @@ import { useState } from "react"
 import FKClient from "@bakaso/fkclient"
 import Widget from "./Widget"
 import LogScreen from "./LogScreen"
+import { parseParam, createFormData } from "./utils"
 
 let client = undefined
 let counter = 0
@@ -26,25 +27,6 @@ export default function App() {
 			} catch { }
 		} else {
 			client.readMeta()
-		}
-	}
-
-	function parseParam(request, parameter) {
-		const node = document.querySelector(`[name="${request}/${parameter}"]`)
-
-		switch (node.type) {
-			case "number":
-				return parseInt(node.value)
-
-			case "checkbox":
-				return node.checked
-
-			case "date":
-				return +new Date(node.value)
-
-			case "text":
-			default:
-				return node.value
 		}
 	}
 
@@ -82,6 +64,31 @@ export default function App() {
 					<button onClick={() => client.readOneThread(parseParam("readOneThread", "id"))} disabled={client === undefined}>readOneThread</button>
 				</Widget>
 				<h2>Posts</h2>
+				<Widget>
+					<label>Board name</label>
+					<input type="text" name="createPost/boardName" defaultValue="b" disabled={client === undefined}></input>
+					<label>Thread number</label>
+					<input type="number" name="createPost/threadNumber" defaultValue="0" disabled={client === undefined}></input>
+					<label>Sage</label>
+					<input type="checkbox" name="createPost/sage" disabled={client === undefined}></input>
+					<label>OP</label>
+					<input type="checkbox" name="createPost/op" disabled={client === undefined}></input>
+					<label>Subject</label>
+					<input type="text" name="createPost/subject" defaultValue="Testing" disabled={client === undefined}></input>
+					<label>Text</label>
+					<input type="text" name="createPost/text" defaultValue="Hello World!" disabled={client === undefined}></input>
+					<label>Password</label>
+					<input type="text" name="createPost/password" defaultValue="123" disabled={client === undefined}></input>
+					<label>File[0]</label>
+					<input type="file" name="createPost/file[0]" disabled={client === undefined}></input>
+					<label>File[0] NSFW marker</label>
+					<input type="checkbox" name="createPost/fileRating[0]" disabled={client === undefined}></input>
+					<label>File[1]</label>
+					<input type="file" name="createPost/file[1]" disabled={client === undefined}></input>
+					<label>File[1] NSFW marker</label>
+					<input type="checkbox" name="createPost/fileRating[1]" disabled={client === undefined}></input>
+					<button onClick={() => client.createPost(createFormData("createPost"))} disabled={client === undefined}>createPost</button>
+				</Widget>
 				<Widget>
 					<label>Board name</label>
 					<input type="text" name="readFeed/boardName" defaultValue="b" disabled={client === undefined}></input>
