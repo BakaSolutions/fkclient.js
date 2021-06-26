@@ -191,8 +191,8 @@ export default class FKClient {
 	}
 
 	createPost(formData: FormData) {
-		this.#http("POST", "newPost", formData).then((data) => {
-			this.#handleMessage({ what: { request: "submitPost" }, data })
+		this.#http("POST", "createPost", formData).then((data) => {
+			this.#handleMessage({ what: { request: "createPost" }, data })
 		})
 	}
 
