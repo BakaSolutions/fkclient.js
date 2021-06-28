@@ -123,6 +123,15 @@ export default function App() {
 					<input type="text" name="deleteOnePost/password" defaultValue="123" disabled={client === undefined}></input>
 					<button onClick={() => client.deleteOnePost(parseParam("deleteOnePost", "id"), parseParam("deleteOnePost", "boardName"), parseParam("deleteOnePost", "number"), parseParam("deleteOnePost", "password"))} disabled={client === undefined}>deleteOnePost</button>
 				</Widget>
+				<h2>Captcha</h2>
+				<Widget>
+					<label>Captcha image</label>
+					<img id="captchaImage" alt="Captcha"></img>
+					<button onClick={() => document.querySelector("#captchaImage").src = client?.captchaImageURI} disabled={client === undefined}>update captcha image</button>
+					<label>Code</label>
+					<input type="text" name="checkCaptcha/code" disabled={client === undefined}></input>
+					<button onClick={() => client.checkCaptcha(parseParam("checkCaptcha", "code"))} disabled={client === undefined}>checkCaptcha</button>
+				</Widget>
 				<h2>Search</h2>
 				<Widget>
 					<label>Query</label>

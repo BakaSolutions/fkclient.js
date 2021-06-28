@@ -235,7 +235,10 @@ export default class FKClient {
 		this.#ws({ request: "search", query, parameters })
 	}
 
-	checkCaptcha(formData: FormData) {
+	checkCaptcha(code: string) {
+		const formData = new FormData()
+		formData.append("code", code)
+
 		this.#http("POST", "checkCaptcha", formData).then((data) => {
 			this.#handleMessage({ what: { request: "POST /checkCaptcha" }, data })
 		})
