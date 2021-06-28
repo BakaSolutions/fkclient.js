@@ -112,6 +112,17 @@ export default function App() {
 					<input type="number" name="readOnePost/id" defaultValue="0" disabled={client === undefined}></input>
 					<button onClick={() => client.readOnePost(parseParam("readOnePost", "id"))} disabled={client === undefined}>readOnePost</button>
 				</Widget>
+				<Widget>
+					<label>Post ID</label>
+					<input type="number" name="deleteOnePost/id" defaultValue="0" disabled={client === undefined}></input>
+					<label>Board name</label>
+					<input type="text" name="deleteOnePost/boardName" defaultValue="b" disabled={client === undefined}></input>
+					<label>Number</label>
+					<input type="number" name="deleteOnePost/number" defaultValue="0" disabled={client === undefined}></input>
+					<label>Password</label>
+					<input type="text" name="deleteOnePost/password" defaultValue="123" disabled={client === undefined}></input>
+					<button onClick={() => client.deleteOnePost(parseParam("deleteOnePost", "id"), parseParam("deleteOnePost", "boardName"), parseParam("deleteOnePost", "number"), parseParam("deleteOnePost", "password"))} disabled={client === undefined}>deleteOnePost</button>
+				</Widget>
 				<h2>Search</h2>
 				<Widget>
 					<label>Query</label>

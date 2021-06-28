@@ -5,6 +5,16 @@ export type Listener = [
 	Function: (arg0: InMessage | OutMessage) => any
 ]
 
+function formDataToObject(formData: FormData) {
+	const obj: {[key:string]: any} = {}
+
+	for (const key of formData.keys()) {
+		obj[key] = formData.get(key)
+	}
+
+	return obj
+}
+
 export type InMessage = {
 	what: {
 		request: string
@@ -137,6 +147,11 @@ export default class FKClient {
 			body: method === "HEAD" || method === "GET" ? null : body
 		}
 
+		this.#handleMessage({
+			request: `${method} /${path}`,
+			data: body ? formDataToObject(body) : undefined
+		})
+
 		return fetch(`${this.#APIServerURI.href}api/${path}`, options)
 			.then((response) => {
 				if (!response.ok) {
@@ -192,13 +207,27 @@ export default class FKClient {
 
 	createPost(formData: FormData) {
 		this.#http("POST", "createPost", formData).then((data) => {
-			this.#handleMessage({ what: { request: "createPost" }, data })
+			this.#handleMessage({ what: { request: "POST /createPost" }, data })
 		})
 	}
 
-	deleteManyPosts(formData: FormData) {
+	deleteOnePost(id: number, boardName: string, number: number, password: string = "") {
+		const formData = new FormData()
+
+		if (Number.isInteger(id)) {
+			// Delete by id
+			formData.append(`selectedPost:${id}`, "true")
+		} else {
+			// Delete by boardName and number
+			formData.append(`selectedPost:${boardName}:${number}`, "true")
+		}
+
+		if (password.length >= 0) {
+			formData.append("password", password)
+		}
+
 		this.#http("POST", "deletePosts", formData).then((data) => {
-			this.#handleMessage({ what: { request: "deletePosts" }, data })
+			this.#handleMessage({ what: { request: "POST /deletePosts" }, data })
 		})
 	}
 
@@ -208,7 +237,7 @@ export default class FKClient {
 
 	checkCaptcha(formData: FormData) {
 		this.#http("POST", "checkCaptcha", formData).then((data) => {
-			this.#handleMessage({ what: { request: "checkCaptcha" }, data })
+			this.#handleMessage({ what: { request: "POST /checkCaptcha" }, data })
 		})
 	}
 }
