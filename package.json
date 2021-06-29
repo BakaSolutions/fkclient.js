@@ -1,6 +1,6 @@
 {
 	"name": "fkclient.js",
-	"license": "MIT",
+	"license": "GPL-3.0",
 	"version": "1.0.0",
 	"main": "fkclient.js",
 	"typings": "fkclient.d.ts",
@@ -9,7 +9,8 @@
 		"fkclient.d.ts"
 	],
 	"scripts": {
-		"build": "tsc"
+		"build": "tsc",
+		"start": "yarn --cwd example start"
 	},
 	"devDependencies": {
 		"@types/node": "^15.12.4",
