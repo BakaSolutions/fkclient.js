@@ -10,7 +10,8 @@
 	],
 	"scripts": {
 		"build": "tsc",
-		"start": "yarn --cwd example start"
+		"start": "yarn --cwd example start",
+		"postinstall": "yarn --cwd example install"
 	},
 	"devDependencies": {
 		"@types/node": "^15.12.4",
