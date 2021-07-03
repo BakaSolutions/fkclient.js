@@ -17,12 +17,13 @@ Soon...
 git clone https://github.com/BakaSolutions/fkclient.js.git
 cd fkclient.js
 
-# Install the dependencies
+# Install the dependencies and manually build the library
 yarn install
-
-# Manually build the library
 yarn build
 
+# Install the dependencies for the example app
+yarn install:example
+
 # Run the example app
-yarn start
+yarn serve:example
 ```
