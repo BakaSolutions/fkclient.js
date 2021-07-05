@@ -41,6 +41,9 @@ export default function App() {
 				<Widget>
 					<button onClick={() => client.readMeta()} disabled={!initialised}>readMeta</button>
 				</Widget>
+				<Widget>
+					<button onClick={() => setLog([])} disabled={!initialised}>Clean log</button>
+				</Widget>
 				<h2>Boards</h2>
 				<Widget>
 					<button onClick={() => client.readManyBoards()} disabled={!initialised}>readManyBoards</button>
