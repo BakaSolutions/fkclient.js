@@ -62,7 +62,7 @@ export default function App() {
 				</Widget>
 				<Widget>
 					<label>Thread ID</label>
-					<input type="number" name="readOneThread/id" defaultValue="0" disabled={!initialised}></input>
+					<input type="number" name="readOneThread/id" defaultValue="1" disabled={!initialised}></input>
 					<button onClick={() => client.readOneThread(parseParam("readOneThread", "id"))} disabled={!initialised}>readOneThread</button>
 				</Widget>
 				<h2>Posts</h2>
@@ -102,7 +102,7 @@ export default function App() {
 				</Widget>
 				<Widget>
 					<label>Thread ID</label>
-					<input type="number" name="readManyPosts/threadID" defaultValue="0" disabled={!initialised}></input>
+					<input type="number" name="readManyPosts/threadID" defaultValue="1" disabled={!initialised}></input>
 					<label>Count</label>
 					<input type="number" name="readManyPosts/count" defaultValue="10" disabled={!initialised}></input>
 					<label>Page</label>
@@ -111,12 +111,12 @@ export default function App() {
 				</Widget>
 				<Widget>
 					<label>Post ID</label>
-					<input type="number" name="readOnePost/id" defaultValue="0" disabled={!initialised}></input>
+					<input type="number" name="readOnePost/id" defaultValue="1" disabled={!initialised}></input>
 					<button onClick={() => client.readOnePost(parseParam("readOnePost", "id"))} disabled={!initialised}>readOnePost</button>
 				</Widget>
 				<Widget>
 					<label>Post ID</label>
-					<input type="number" name="deleteOnePost/id" defaultValue="0" disabled={!initialised}></input>
+					<input type="number" name="deleteOnePost/id" defaultValue="1" disabled={!initialised}></input>
 					<label>Board name</label>
 					<input type="text" name="deleteOnePost/boardName" defaultValue="b" disabled={!initialised}></input>
 					<label>Number</label>
