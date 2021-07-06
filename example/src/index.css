@@ -55,3 +55,14 @@ main > * {
 .widget input {
 	background-color: #f9f9f9;
 }
+
+h2 {
+	cursor: pointer;
+	user-select: none;
+}
+
+h2::before {
+	content: attr(data-symbol);
+	width: 0.5em;
+	display: inline-block;
+}
