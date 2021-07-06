@@ -1,7 +1,22 @@
 {
-	"name": "fkclient.js",
-	"license": "GPL-3.0",
-	"version": "1.0.0",
+	"name": "@bakaso/fkclient",
+	"version": "0.1.0",
+	"description": "A wrapper library for Foxtan API.",
+	"keywords": [
+		"foxtan",
+		"api",
+		"client",
+		"library"
+	],
+	"homepage": "https://github.com/BakaSolutions/fkclient.js",
+	"bugs": {
+		"url": "https://github.com/BakaSolutions/fkclient.js/issues",
+		"email": "man90@tuta.io"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/BakaSolutions/fkclient.js.git"
+	},
 	"main": "fkclient.js",
 	"typings": "fkclient.d.ts",
 	"files": [
@@ -13,6 +28,8 @@
 		"install:example": "yarn --cwd example install",
 		"serve:example": "yarn --cwd example start"
 	},
+	"author": "man90 <man90@tuta.io> (https://github.com/octoman90)",
+	"license": "GPL-3.0",
 	"devDependencies": {
 		"@types/node": "^15.12.4",
 		"typescript": "^4.3.4"
