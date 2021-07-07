@@ -4,7 +4,17 @@ A wrapper library for [Foxtan](https://github.com/BakaSolutions/foxtan) API.
 
 ## Installation
 
-Soon...
+With Yarn:
+
+```bash
+yarn add @bakaso/fkclient
+```
+
+With NPM:
+
+```bash
+npm install @bakaso/fkclient
+```
 
 ## Usage
 
