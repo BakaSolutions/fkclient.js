@@ -1,4 +1,3 @@
 node_modules
 
-/fkclient.js
-/fkclient.d.ts
+/dist/*

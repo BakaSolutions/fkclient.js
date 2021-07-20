@@ -46,25 +46,26 @@ client.addListener(
 4. Make your requests.
 
 ```javascript
-client.readManyBoards()
+client.board.requestMany()
 ```
 
 You can find a more detailed documentation [here](docs/README.md).
 
 ## Running the example app
-
 ```bash
 # Clone this repository
 git clone https://github.com/BakaSolutions/fkclient.js.git
 cd fkclient.js
 
-# Install the dependencies and manually build the library
+# Install the dependencies
 yarn install
+
+# Manually build the library
 yarn build
 
 # Install the dependencies for the example app
-yarn install:example
+yarn install-example
 
 # Run the example app
-yarn serve:example
+yarn serve-example
 ```

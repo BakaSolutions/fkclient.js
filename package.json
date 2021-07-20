@@ -17,21 +17,21 @@
 		"type": "git",
 		"url": "https://github.com/BakaSolutions/fkclient.js.git"
 	},
-	"main": "fkclient.js",
-	"typings": "fkclient.d.ts",
-	"files": [
-		"fkclient.js",
-		"fkclient.d.ts"
-	],
+	"main": "./dist/FKClient.js",
+	"typings": "./dist/FKClient.d.ts",
+	"files": ["./dist/*"],
 	"scripts": {
-		"build": "tsc",
-		"install:example": "yarn --cwd example install",
-		"serve:example": "yarn --cwd example start"
+		"build": "webpack",
+		"install-example": "yarn --cwd example install",
+		"serve-example": "yarn --cwd example serve"
 	},
 	"author": "man90 <man90@tuta.io> (https://github.com/octoman90)",
 	"license": "GPL-3.0",
 	"devDependencies": {
 		"@types/node": "^15.12.4",
-		"typescript": "^4.3.4"
+		"ts-loader": "^9.2.3",
+		"typescript": "^4.3.5",
+		"webpack": "^5.44.0",
+		"webpack-cli": "^4.7.2"
 	}
 }
