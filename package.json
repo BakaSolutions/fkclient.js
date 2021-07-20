@@ -22,8 +22,8 @@
 	"files": ["./dist/*"],
 	"scripts": {
 		"build": "webpack",
-		"install:example": "yarn --cwd example install",
-		"serve:example": "yarn --cwd example start"
+		"install-example": "yarn --cwd example install",
+		"serve-example": "yarn --cwd example serve"
 	},
 	"author": "man90 <man90@tuta.io> (https://github.com/octoman90)",
 	"license": "GPL-3.0",
