@@ -13,10 +13,10 @@ export default function App() {
 	const [log, setLog] = useState([])
 	const [initialised, setInitialised] = useState(false)
 
-	function connect(uri) {
+	function connect(uri, reconnectDelay) {
 		try {
 			// Create an FKClient instance and tie it to a specific API address
-			client = new FKClient(uri)
+			client = new FKClient(uri, reconnectDelay)
 
 			// Add message listeners
 			// The second parameter is a handler function, that decides what to do with the message
@@ -40,7 +40,12 @@ export default function App() {
 					<Widget>
 						<label>API address</label>
 						<input type="text" name="connect/uri" defaultValue="http://127.0.0.1:6749" disabled={initialised}></input>
-						<button onClick={() => connect(parseParam("connect", "uri"))} disabled={initialised}>Connect</button>
+						<label>Reconnection delay</label>
+						<input type="number" name="connect/reconnectDelay" defaultValue="5000" disabled={initialised}></input>
+						<button onClick={() => connect(parseParam("connect", "uri"), parseParam("connect", "reconnectDelay"))} disabled={initialised}>Connect</button>
+					</Widget>
+					<Widget>
+						<button onClick={() => client.reconnect()} disabled={!initialised}>Reconnect now</button>
 					</Widget>
 					<Widget>
 						<button onClick={() => setLog([])} disabled={!initialised}>Clean log</button>

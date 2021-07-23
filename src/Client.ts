@@ -43,19 +43,18 @@ function formDataToObject(formData: FormData) {
 	return obj
 }
 
-function wait(delay: number): Promise<void> {
-	return new Promise(resolve => setTimeout(resolve, delay))
-}
-
 export default class Client {
 	#APIServerURI: URL
 	#WSGate?: WebSocket
 	#ready: boolean = false
 	#meta: { engine?: string, res?: string, thumb?: string } = {}
 	#messageHandlers: Listener[] = []
+	#reconnectDelay: number
+	#reconnectInterval?: number
 
-	constructor(uri: string) {
+	constructor(uri: string, reconnectDelay: number = 0) {
 		this.#APIServerURI = new URL(uri)
+		this.#reconnectDelay = reconnectDelay
 
 		this.addListener((message) => {
 			return "what" in message && message.data?.ws !== undefined
@@ -67,7 +66,13 @@ export default class Client {
 			this.#WSGate = new WebSocket((message as {data: {ws: string}}).data.ws)
 
 			this.#WSGate.onopen = () => this.#ready = true
-			this.#WSGate.onclose = () => this.#ready = false
+			this.#WSGate.onclose = (event) => {
+				this.#ready = false
+
+				if (event.wasClean === false && this.#reconnectDelay > 0) {
+					this.reconnect()
+				}
+			}
 			window.onbeforeunload = () => this.#WSGate?.close()
 
 			this.#WSGate.addEventListener("message", (message) => {
@@ -75,7 +80,22 @@ export default class Client {
 			})
 		})
 
-		this.http("GET", "meta", null, 1e3)
+		this.reconnect()
+	}
+
+	reconnect(client: Client = this): void {
+		client.http("GET", "meta", null)
+			.then(() => {
+				window.clearInterval(client.#reconnectInterval)
+				client.#reconnectInterval = undefined
+			})
+			.catch((error) => {
+				if (client.#reconnectDelay > 0 && client.#reconnectInterval === undefined) {
+					client.#reconnectInterval = window.setInterval(client.reconnect, client.#reconnectDelay, client)
+				}
+
+				throw `Couldn't reconnect: fetch request failed with status code ${error}`
+			})
 	}
 
 	get ready(): boolean {
@@ -122,7 +142,7 @@ export default class Client {
 		}, 1e2)
 	}
 
-	async http(method: string, path: string, body: FormData | null, retryDelay: number = 0): Promise<object> {
+	async http(method: string, path: string, body: FormData | null): Promise<object> {
 		let options: RequestInit = {
 			method: method,
 			mode: "cors",
@@ -149,14 +169,6 @@ export default class Client {
 			.then((data) => {
 				this.#handleMessage({ what: { request: path }, data })
 				return data
-			})
-			.catch(async (error) => {
-				if (!retryDelay) {
-					throw `${path} fetch request failed with status code ${error}`
-				}
-
-				console.log(`${path} fetch request failed with status code ${error}, retrying in ${retryDelay / 1e3} seconds`)
-				return wait(retryDelay).then(() => this.http(method, path, body, retryDelay << 1))
 			})
 	}
 }

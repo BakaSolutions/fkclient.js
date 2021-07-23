@@ -14,13 +14,17 @@ export default class FKClient {
 	#post?: Post
 	#captcha?: Captcha
 
-	constructor(uri: string) {
-		this.#client = new Client(uri)
+	constructor(uri: string, reconnectDelay: number) {
+		this.#client = new Client(uri, reconnectDelay)
 
 		this.#board = new Board(this.#client)
 		this.#thread = new Thread(this.#client)
 		this.#post = new Post(this.#client)
 		this.#captcha = new Captcha(this.#client)
+	}
+
+	reconnect() {
+		this.#client.reconnect()
 	}
 
 	get ready() {
