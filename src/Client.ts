@@ -43,21 +43,18 @@ function formDataToObject(formData: FormData) {
 	return obj
 }
 
-function wait(delay: number): Promise<void> {
-	return new Promise(resolve => setTimeout(resolve, delay))
-}
-
 export default class Client {
 	#APIServerURI: URL
 	#WSGate?: WebSocket
 	#ready: boolean = false
 	#meta: { engine?: string, res?: string, thumb?: string } = {}
 	#messageHandlers: Listener[] = []
-	#reconnectInterval: number
+	#reconnectDelay: number
+	#reconnectInterval?: number
 
-	constructor(uri: string, reconnectInterval: number = 1e3) {
+	constructor(uri: string, reconnectDelay: number = 0) {
 		this.#APIServerURI = new URL(uri)
-		this.#reconnectInterval = reconnectInterval
+		this.#reconnectDelay = reconnectDelay
 
 		this.addListener((message) => {
 			return "what" in message && message.data?.ws !== undefined
@@ -72,7 +69,7 @@ export default class Client {
 			this.#WSGate.onclose = (event) => {
 				this.#ready = false
 
-				if (event.wasClean === false) {
+				if (event.wasClean === false && this.#reconnectDelay > 0) {
 					this.reconnect()
 				}
 			}
@@ -86,33 +83,19 @@ export default class Client {
 		this.reconnect()
 	}
 
-	async reconnect(): Promise<void> {
-		enum ReconnectState {
-			Initial,
-			Retry,
-			Reconnected,
-			Failed,
-		}
+	reconnect(client: Client = this): void {
+		client.http("GET", "meta", null)
+			.then(() => {
+				window.clearInterval(client.#reconnectInterval)
+				client.#reconnectInterval = undefined
+			})
+			.catch((error) => {
+				if (client.#reconnectDelay > 0 && client.#reconnectInterval === undefined) {
+					client.#reconnectInterval = window.setInterval(client.reconnect, client.#reconnectDelay, client)
+				}
 
-		let state: ReconnectState = ReconnectState.Initial
-
-		while (state < 2 && this.#ready === false) {
-			state = await this.http("GET", "meta", null)
-				.then(() => ReconnectState.Reconnected)
-				.catch((error) => {
-					if (this.#reconnectInterval) {
-						console.warn(`Couldn't reconnect: fetch request failed with status code ${error}, retrying in ${this.#reconnectInterval / 1e3} seconds`)
-						return wait(this.#reconnectInterval).then(() => ReconnectState.Retry)
-					}
-
-					console.error(`Couldn't reconnect: fetch request failed with status code ${error}`)
-					return ReconnectState.Failed
-				})
-		}
-
-		if (state === ReconnectState.Failed) {
-			throw "Couldn't reconnect"
-		}
+				throw `Couldn't reconnect: fetch request failed with status code ${error}`
+			})
 	}
 
 	get ready(): boolean {
