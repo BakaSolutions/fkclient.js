@@ -36,7 +36,9 @@ export default function App() {
 	}
 
 	function refreshCaptcha() {
-		captchaImg.current.src = client?.captcha.imageURI
+		if (captchaImg.current) {
+			captchaImg.current.src = client?.captcha.imageURI
+		}
 	}
 
 	return (
