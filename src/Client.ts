@@ -154,7 +154,7 @@ export default class Client {
 		}
 
 		this.#handleMessage({
-			request: `${method} /${path}`,
+			request: path,
 			data: body ? formDataToObject(body) : undefined
 		})
 
