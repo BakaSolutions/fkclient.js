@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, createRef } from "react"
 import FKClient from "@bakaso/fkclient"
 import { parseParam, parseToObject } from "./utils/index.js"
 
@@ -12,6 +12,7 @@ let counter = 0
 export default function App() {
 	const [log, setLog] = useState([])
 	const [initialised, setInitialised] = useState(false)
+	const captchaImg = createRef()
 
 	function connect(uri, reconnectDelay) {
 		try {
@@ -28,9 +29,14 @@ export default function App() {
 			)
 
 			setInitialised(true)
+			refreshCaptcha()
 		} catch(err) {
 			console.error(err)
 		}
+	}
+
+	function refreshCaptcha() {
+		captchaImg.current.src = client?.captcha.imageURI
 	}
 
 	return (
@@ -161,8 +167,8 @@ export default function App() {
 				<Category name="Captcha">
 					<Widget>
 						<label>Captcha image</label>
-						<img id="captchaImage" alt="Captcha"></img>
-						<button onClick={() => document.querySelector("#captchaImage").src = client.captcha.imageURI} disabled={!initialised}>Update captcha image</button>
+						<img id="captchaImage" alt="Captcha" ref={captchaImg}></img>
+						<button onClick={refreshCaptcha} disabled={!initialised}>Refresh captcha image</button>
 						<label>Code</label>
 						<input type="text" name="captcha.validate/code" disabled={!initialised}></input>
 						<button onClick={() => client.captcha.validate(parseToObject("captcha.validate"))} disabled={!initialised}>Validate captcha</button>
