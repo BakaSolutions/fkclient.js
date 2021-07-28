@@ -1,6 +1,6 @@
 {
 	"name": "@bakaso/fkclient",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "A wrapper library for Foxtan API.",
 	"keywords": [
 		"foxtan",
@@ -17,9 +17,9 @@
 		"type": "git",
 		"url": "https://github.com/BakaSolutions/fkclient.js.git"
 	},
-	"main": "./dist/FKClient.js",
-	"typings": "./dist/FKClient.d.ts",
-	"files": ["./dist/*"],
+	"main": "dist/FKClient.js",
+	"typings": "dist/FKClient.d.ts",
+	"files": ["dist/*"],
 	"scripts": {
 		"build": "webpack",
 		"install-example": "yarn --cwd example install",
