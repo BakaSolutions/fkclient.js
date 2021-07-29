@@ -172,7 +172,7 @@ export default function App() {
 						<img id="captchaImage" alt="Captcha" src={client?.captcha.imageURI} ref={captchaImg}></img>
 						<button onClick={refreshCaptcha} disabled={!initialised}>Refresh captcha image</button>
 						<label>Code</label>
-						<input type="text" name="captcha.validate/code" disabled={!initialised}></input>
+						<input type="number" name="captcha.validate/code" disabled={!initialised}></input>
 						<button onClick={() => client.captcha.validate(parseToObject("captcha.validate"))} disabled={!initialised}>Validate captcha</button>
 					</Widget>
 				</Category>
