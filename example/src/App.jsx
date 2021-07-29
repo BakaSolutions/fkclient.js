@@ -123,7 +123,7 @@ export default function App() {
 						<label>Head number</label>
 						<input type="number" name="post.requestMany/headNumber" defaultValue="1" disabled={!initialised}></input>
 						<label>Thread ID</label>
-						<input type="number" name="post.requestMany/threadID" defaultValue="1" disabled={!initialised}></input>
+						<input type="number" name="post.requestMany/threadId" defaultValue="1" disabled={!initialised}></input>
 						<label>Count</label>
 						<input type="number" name="post.requestMany/count" defaultValue="10" disabled={!initialised}></input>
 						<label>Page</label>
