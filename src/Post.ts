@@ -77,9 +77,6 @@ export default class Post {
 	}
 
 	findMany({ query, parameters }: { query: string, parameters: { boardName?: string, threadNumber?: number, threadId?: number, after?: Date, before?: Date, limitToSubjects?: boolean }}) {
-		(parameters as { boardName?: string, threadNumber?: number, threadId?: number, after?: Date, before?: Date, searchOnlyInSubjects?: boolean }).searchOnlyInSubjects = parameters.limitToSubjects
-		delete parameters.limitToSubjects
-
 		this.client.ws({ request: "search", query, parameters })
 	}
 
