@@ -167,7 +167,15 @@ export default class Client {
 				return response.json()
 			})
 			.then((data) => {
-				this.#handleMessage({ what: { request: path }, data })
+				const dataWithoutError = { ...data }
+				delete dataWithoutError.error
+
+				this.#handleMessage({
+					what: { request: path, ...(body ? formDataToObject(body) : {}) },
+					data: dataWithoutError,
+					error: data.error,
+				})
+
 				return data
 			})
 	}
