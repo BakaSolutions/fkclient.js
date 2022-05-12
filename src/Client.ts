@@ -33,6 +33,12 @@ export type OutMessage = {
 	data?: object
 }
 
+type Meta = {
+	engine?: string
+	res?: { path: string }
+	thumb?: { path: string, format: string, width: number, height: number }
+}
+
 function formDataToObject(formData: FormData) {
 	const obj: {[key:string]: any} = {}
 
@@ -47,7 +53,7 @@ export default class Client {
 	#APIServerURI: URL
 	#WSGate?: WebSocket
 	#ready: boolean = false
-	#meta: { engine?: string, res?: string, thumb?: string } = {}
+	#meta: Meta = {}
 	#messageHandlers: Listener[] = []
 	#reconnectDelay: number
 	#reconnectInterval?: number
@@ -102,7 +108,7 @@ export default class Client {
 		return this.#ready
 	}
 
-	get meta(): { engine?: string, res?: string, thumb?: string } {
+	get meta(): Meta {
 		return this.#meta
 	}
 

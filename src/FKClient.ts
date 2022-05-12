@@ -39,11 +39,11 @@ export default class FKClient {
 		return this.#client?.meta?.engine || null
 	}
 
-	get resPath(): string | null {
+	get res(): { path: string } | null {
 		return this.#client?.meta?.res || null
 	}
 
-	get thumbPath(): string | null {
+	get thumb(): { path: string, format: string, width: number, height: number } | null {
 		return this.#client?.meta?.thumb || null
 	}
 
