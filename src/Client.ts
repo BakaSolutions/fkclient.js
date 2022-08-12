@@ -1,53 +1,5 @@
-type Listener = [
-	Function: (arg0: InMessage | OutMessage) => boolean,
-	Function: (arg0: InMessage | OutMessage) => any
-]
-
-export type InMessage = {
-	what: OutMessage,
-
-	data: {
-		ws?: string
-	}
-
-	error?: {
-		message?: string
-		description?: string
-		code?: string
-	}
-}
-
-export type OutMessage = {
-	request?: string
-	name?: string
-	id?: number
-	number?: number
-	threadNumber?: number
-	threadId?: number
-	query?: string
-	boardName?: string
-	count?: number
-	page?: number
-	parameters?: object
-
-	data?: object
-}
-
-type Meta = {
-	engine?: string
-	res?: { path: string }
-	thumb?: { path: string, format: string, width: number, height: number }
-}
-
-function formDataToObject(formData: FormData) {
-	const obj: {[key:string]: any} = {}
-
-	for (const key of formData.keys()) {
-		obj[key] = formData.get(key)
-	}
-
-	return obj
-}
+import { formDataToObject } from "./utils"
+import type { InMessage, Listener, Meta, OutMessage } from "./types"
 
 export default class Client {
 	#APIServerURI: URL
@@ -62,42 +14,53 @@ export default class Client {
 		this.#APIServerURI = new URL(uri)
 		this.#reconnectDelay = reconnectDelay
 
-		this.addListener((message) => {
-			return "what" in message && message.data?.ws !== undefined
-		}, (message) => {
-			this.#meta = { ...this.#meta, ...message.data }
-			if (this.#WSGate !== undefined) {
-				this.#WSGate.close()
-			}
-			this.#WSGate = new WebSocket((message as {data: {ws: string}}).data.ws)
-
-			this.#WSGate.onopen = () => this.#ready = true
-			this.#WSGate.onclose = (event) => {
-				this.#ready = false
-
-				if (event.wasClean === false && this.#reconnectDelay > 0) {
-					this.reconnect()
+		this.addListener(
+			(message) => "what" in message && message.data?.ws !== undefined,
+			(message) => {
+				this.#meta = { ...this.#meta, ...message.data }
+				if (this.#WSGate !== undefined) {
+					this.#WSGate.close()
 				}
-			}
-			window.onbeforeunload = () => this.#WSGate?.close()
+				this.#WSGate = new WebSocket(
+					(message as { data: { ws: string } }).data.ws
+				)
 
-			this.#WSGate.addEventListener("message", (message) => {
-				this.#handleMessage(JSON.parse(message.data))
-			})
-		})
+				this.#WSGate.onopen = () => (this.#ready = true)
+				this.#WSGate.onclose = (event) => {
+					this.#ready = false
+
+					if (event.wasClean === false && this.#reconnectDelay > 0) {
+						this.reconnect()
+					}
+				}
+				window.onbeforeunload = () => this.#WSGate?.close()
+
+				this.#WSGate.addEventListener("message", (message) => {
+					this.#handleMessage(JSON.parse(message.data))
+				})
+			}
+		)
 
 		this.reconnect()
 	}
 
 	reconnect(client: Client = this): void {
-		client.http("GET", "meta", null)
+		client
+			.http("GET", "meta", null)
 			.then(() => {
 				window.clearInterval(client.#reconnectInterval)
 				client.#reconnectInterval = undefined
 			})
 			.catch((error) => {
-				if (client.#reconnectDelay > 0 && client.#reconnectInterval === undefined) {
-					client.#reconnectInterval = window.setInterval(client.reconnect, client.#reconnectDelay, client)
+				if (
+					client.#reconnectDelay > 0 &&
+					client.#reconnectInterval === undefined
+				) {
+					client.#reconnectInterval = window.setInterval(
+						client.reconnect,
+						client.#reconnectDelay,
+						client
+					)
 				}
 
 				throw `Couldn't reconnect: fetch request failed with status code ${error}`
@@ -124,16 +87,21 @@ export default class Client {
 		})
 	}
 
-	addListener(filter: (arg0: InMessage | OutMessage) => boolean, callback: (arg0: InMessage | OutMessage) => any) {
+	addListener(
+		filter: (arg0: InMessage | OutMessage) => boolean,
+		callback: (arg0: InMessage | OutMessage) => any
+	) {
 		this.#messageHandlers.push([filter, callback])
 	}
 
 	removeListener(filter: (arg0: InMessage | OutMessage) => boolean) {
-		this.#messageHandlers = this.#messageHandlers.filter((handler) => handler[0] !== filter)
+		this.#messageHandlers = this.#messageHandlers.filter(
+			(handler) => handler[0] !== filter
+		)
 	}
 
 	ws(req: OutMessage): void {
-		let i = setInterval(() => {
+		const i = setInterval(() => {
 			this.#handleMessage(req)
 
 			clearInterval(i)
@@ -148,20 +116,24 @@ export default class Client {
 		}, 1e2)
 	}
 
-	async http(method: string, path: string, body: FormData | null): Promise<object> {
-		let options: RequestInit = {
+	async http(
+		method: string,
+		path: string,
+		body: FormData | null
+	): Promise<object> {
+		const options: RequestInit = {
 			method: method,
 			mode: "cors",
 			credentials: "include",
 			headers: {
-				"X-Requested-With": "XMLHttpRequest"
+				"X-Requested-With": "XMLHttpRequest",
 			},
-			body: method === "HEAD" || method === "GET" ? null : body
+			body: method === "HEAD" || method === "GET" ? null : body,
 		}
 
 		this.#handleMessage({
 			request: path,
-			data: body ? formDataToObject(body) : undefined
+			data: body ? formDataToObject(body) : undefined,
 		})
 
 		return fetch(`${this.#APIServerURI.href}api/${path}`, options)
@@ -177,7 +149,10 @@ export default class Client {
 				delete dataWithoutError.error
 
 				this.#handleMessage({
-					what: { request: path, ...(body ? formDataToObject(body) : {}) },
+					what: {
+						request: path,
+						...(body ? formDataToObject(body) : {}),
+					},
 					data: dataWithoutError,
 					error: data.error,
 				})

@@ -1,11 +1,9 @@
-import Client, {
-	InMessage,
-	OutMessage
-}              from "./Client"
-import Board   from "./Board"
-import Thread  from "./Thread"
-import Post    from "./Post"
+import Board from "./Board"
 import Captcha from "./Captcha"
+import Client from "./Client"
+import Post from "./Post"
+import Thread from "./Thread"
+import type { InMessage, OutMessage } from "./types"
 
 export default class FKClient {
 	#client: Client
@@ -43,11 +41,19 @@ export default class FKClient {
 		return this.#client?.meta?.res || null
 	}
 
-	get thumb(): { path: string, format: string, width: number, height: number } | null {
+	get thumb(): {
+		path: string
+		format: string
+		width: number
+		height: number
+	} | null {
 		return this.#client?.meta?.thumb || null
 	}
 
-	addListener(filter: (arg0: InMessage | OutMessage) => boolean, callback: (arg0: InMessage | OutMessage) => any) {
+	addListener(
+		filter: (arg0: InMessage | OutMessage) => boolean,
+		callback: (arg0: InMessage | OutMessage) => any
+	) {
 		return this.#client.addListener(filter, callback)
 	}
 
@@ -71,5 +77,3 @@ export default class FKClient {
 		return this.#captcha
 	}
 }
-
-// module.exports = FKClient
