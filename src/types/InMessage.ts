@@ -1,12 +1,8 @@
 import type { OutMessage } from "./OutMessage"
 
-export type InMessage = {
+export type InMessage<T> = {
 	what: OutMessage
-
-	data: {
-		ws?: string
-	}
-
+	data: T
 	error?: {
 		message?: string
 		description?: string

@@ -1,3 +1,4 @@
+import Auth from "./Auth"
 import Board from "./Board"
 import Captcha from "./Captcha"
 import Client from "./Client"
@@ -7,18 +8,21 @@ import type { InMessage, OutMessage } from "./types"
 
 export default class FKClient {
 	#client: Client
+
+	#auth?: Auth
 	#board?: Board
-	#thread?: Thread
-	#post?: Post
 	#captcha?: Captcha
+	#post?: Post
+	#thread?: Thread
 
 	constructor(uri: string, reconnectDelay: number) {
 		this.#client = new Client(uri, reconnectDelay)
 
+		this.#auth = new Auth(this.#client)
 		this.#board = new Board(this.#client)
-		this.#thread = new Thread(this.#client)
-		this.#post = new Post(this.#client)
 		this.#captcha = new Captcha(this.#client)
+		this.#post = new Post(this.#client)
+		this.#thread = new Thread(this.#client)
 	}
 
 	reconnect() {
@@ -51,14 +55,18 @@ export default class FKClient {
 	}
 
 	addListener(
-		filter: (arg0: InMessage | OutMessage) => boolean,
-		callback: (arg0: InMessage | OutMessage) => any
+		filter: (arg0: InMessage<any> | OutMessage) => boolean,
+		callback: (arg0: InMessage<any> | OutMessage) => any
 	) {
 		return this.#client.addListener(filter, callback)
 	}
 
-	removeListener(filter: (arg0: InMessage | OutMessage) => boolean) {
+	removeListener(filter: (arg0: InMessage<any> | OutMessage) => boolean) {
 		return this.#client.removeListener(filter)
+	}
+
+	get auth() {
+		return this.#auth
 	}
 
 	get board() {

@@ -1,10 +1,9 @@
-import { useState, createRef } from "react"
-import FKClient from "@bakaso/fkclient"
 import { parseParam, parseToObject } from "./utils/index.js"
-
-import Category  from "./components/Category.jsx"
-import Widget    from "./components/Widget.jsx"
+import { useState, createRef } from "react"
+import Category from "./components/Category.jsx"
+import FKClient from "@bakaso/fkclient"
 import LogScreen from "./components/LogScreen.jsx"
+import Widget from "./components/Widget.jsx"
 
 let client = undefined
 let counter = 0
@@ -36,7 +35,7 @@ export default function App() {
 	}
 
 	function refreshCaptcha() {
-		if (captchaImg.current) {
+		if(captchaImg.current) {
 			captchaImg.current.src = client?.captcha.imageURI
 		}
 	}
@@ -44,136 +43,237 @@ export default function App() {
 	return (
 		<>
 			<div id="buttons">
-				<Category name="General" openByDefault={ true }>
+				<Category name="General" openByDefault={true}>
 					<Widget>
 						<label>API address</label>
-						<input type="text" name="connect/uri" defaultValue="http://127.0.0.1:6749" disabled={initialised}></input>
+						<input type="text" name="connect/uri" defaultValue="http://127.0.0.1:6749" disabled={initialised} />
 						<label>Reconnection delay</label>
-						<input type="number" name="connect/reconnectDelay" defaultValue="5000" disabled={initialised}></input>
-						<button onClick={() => connect(parseParam("connect", "uri"), parseParam("connect", "reconnectDelay"))} disabled={initialised}>Connect</button>
+						<input type="number" name="connect/reconnectDelay" defaultValue="5000" disabled={initialised} />
+						<button
+							disabled={initialised}
+							onClick={() => connect(parseParam("connect", "uri"), parseParam("connect", "reconnectDelay"))}
+						>
+							Connect
+						</button>
 					</Widget>
 					<Widget>
-						<button onClick={() => client.reconnect()} disabled={!initialised}>Reconnect now</button>
+						<button
+							disabled={!initialised}
+							onClick={() => client.reconnect()}
+						>
+							Reconnect now
+						</button>
 					</Widget>
 					<Widget>
-						<button onClick={() => setLog([])} disabled={!initialised}>Clean log</button>
+						<button
+							disabled={!initialised}
+							onClick={() => setLog([])}
+						>
+							Clean log
+						</button>
+					</Widget>
+				</Category>
+				<Category name="Auth">
+					<Widget>
+						<button
+							disabled={!initialised}
+							onClick={() => client.auth.whoAmI()}
+						>
+							Who am I
+						</button>
+					</Widget>
+					<Widget>
+						<label>Name</label>
+						<input type="text" name="auth.logOn/name" defaultValue="Admin" />
+						<label>Email</label>
+						<input type="text" name="auth.logOn/email" defaultValue="" />
+						<label>Password</label>
+						<input type="text" name="auth.logOn/password" defaultValue="changeme" />
+						<button
+							disabled={!initialised}
+							onClick={() => client.auth.logOn(parseToObject("auth.logOn"))}
+						>
+							Log on
+						</button>
+					</Widget>
+					<Widget>
+						<button
+							disabled={!initialised}
+							onClick={() => client.auth.logOff()}
+						>
+							Log off
+						</button>
 					</Widget>
 				</Category>
 				<Category name="Boards">
 					<Widget>
-						<button onClick={() => client.board.requestMany()} disabled={!initialised}>readManyBoards</button>
+						<button
+							onClick={() => client.board.requestMany()} disabled={!initialised}
+						>
+							Request all boards
+						</button>
 					</Widget>
 					<Widget>
 						<label>Board name</label>
-						<input type="text" name="board.request/boardName" defaultValue="test" disabled={!initialised}></input>
-						<button onClick={() => client.board.request(parseToObject("board.request"))} disabled={!initialised}>Request board</button>
+						<input type="text" name="board.request/boardName" defaultValue="test" />
+						<button
+							disabled={!initialised}
+							onClick={() => client.board.request(parseToObject("board.request"))}
+						>
+							Request board
+						</button>
 					</Widget>
 				</Category>
 				<Category name="Threads">
 					<Widget>
 						<label>Board name</label>
-						<input type="text" name="thread.requestMany/boardName" defaultValue="test" disabled={!initialised}></input>
+						<input type="text" name="thread.requestMany/boardName" defaultValue="test" />
 						<label>Count</label>
-						<input type="number" name="thread.requestMany/count" defaultValue="10" disabled={!initialised}></input>
+						<input type="number" name="thread.requestMany/count" defaultValue="10" />
 						<label>Page</label>
-						<input type="number" name="thread.requestMany/page" defaultValue="0" disabled={!initialised}></input>
-						<button onClick={() => client.thread.requestMany(parseToObject("thread.requestMany"))} disabled={!initialised}>Request many threads</button>
+						<input type="number" name="thread.requestMany/page" defaultValue="0" />
+						<button
+							disabled={!initialised}
+							onClick={() => client.thread.requestMany(parseToObject("thread.requestMany"))}
+						>
+							Request many threads
+						</button>
 					</Widget>
 					<Widget>
 						<label>Thread ID</label>
-						<input type="number" name="thread.request/threadId" defaultValue="1" disabled={!initialised}></input>
+						<input type="number" name="thread.request/threadId" defaultValue="1" />
 						<label>Board name</label>
-						<input type="text" name="thread.request/boardName" defaultValue="test" disabled={!initialised}></input>
+						<input type="text" name="thread.request/boardName" defaultValue="test" />
 						<label>Head number</label>
-						<input type="number" name="thread.request/headNumber" defaultValue="1" disabled={!initialised}></input>
-						<button onClick={() => client.thread.request(parseToObject("thread.request"))} disabled={!initialised}>Request thread</button>
+						<input type="number" name="thread.request/headNumber" defaultValue="1" />
+						<button
+							disabled={!initialised}
+							onClick={() => client.thread.request(parseToObject("thread.request"))}
+						>
+							Request thread
+						</button>
 					</Widget>
 				</Category>
 				<Category name="Posts">
 					<Widget>
 						<label>Thread ID</label>
-						<input type="number" name="post.create/threadId" defaultValue="1" disabled={!initialised}></input>
+						<input type="number" name="post.create/threadId" defaultValue="1" />
 						<label>Board name</label>
-						<input type="text" name="post.create/boardName" defaultValue="test" disabled={!initialised}></input>
+						<input type="text" name="post.create/boardName" defaultValue="test" />
 						<label>Head number</label>
-						<input type="number" name="post.create/headNumber" defaultValue="1" disabled={!initialised}></input>
+						<input type="number" name="post.create/headNumber" defaultValue="1" />
 						<label>Sage</label>
-						<input type="checkbox" name="post.create/sage" disabled={!initialised}></input>
+						<input type="checkbox" name="post.create/sage" />
 						<label>Signed</label>
-						<input type="checkbox" name="post.create/signed" disabled={!initialised}></input>
+						<input type="checkbox" name="post.create/signed" />
 						<label>OP</label>
-						<input type="checkbox" name="post.create/op" disabled={!initialised}></input>
+						<input type="checkbox" name="post.create/op" />
 						<label>Subject</label>
-						<input type="text" name="post.create/subject" defaultValue="Testing" disabled={!initialised}></input>
+						<input type="text" name="post.create/subject" defaultValue="Testing" />
 						<label>Text</label>
-						<input type="text" name="post.create/text" defaultValue="Hello World!" disabled={!initialised}></input>
+						<input type="text" name="post.create/text" defaultValue="Hello World!" />
 						<label>File[0]</label>
-						<input type="file" name="post.create/file[0]" disabled={!initialised}></input>
+						<input type="file" name="post.create/file[0]" />
 						<label>File[0] NSFW marker</label>
-						<input type="checkbox" name="post.create/fileRating[0]" disabled={!initialised}></input>
+						<input type="checkbox" name="post.create/fileRating[0]" />
 						<label>File[1]</label>
-						<input type="file" name="post.create/file[1]" disabled={!initialised}></input>
+						<input type="file" name="post.create/file[1]" />
 						<label>File[1] NSFW marker</label>
-						<input type="checkbox" name="post.create/fileRating[1]" disabled={!initialised}></input>
-						<button onClick={() => client.post.create(parseToObject("post.create"))} disabled={!initialised}>Create post</button>
+						<input type="checkbox" name="post.create/fileRating[1]" />
+						<button
+							disabled={!initialised}
+							onClick={() => client.post.create(parseToObject("post.create"))}
+						>
+							Create post
+						</button>
 					</Widget>
 					<Widget>
 						<label>Board name</label>
-						<input type="text" name="post.requestMany/boardName" defaultValue="test" disabled={!initialised}></input>
+						<input type="text" name="post.requestMany/boardName" defaultValue="test" />
 						<label>Head number</label>
-						<input type="number" name="post.requestMany/headNumber" defaultValue="1" disabled={!initialised}></input>
+						<input type="number" name="post.requestMany/headNumber" defaultValue="1" />
 						<label>Thread ID</label>
-						<input type="number" name="post.requestMany/threadId" defaultValue="1" disabled={!initialised}></input>
+						<input type="number" name="post.requestMany/threadId" defaultValue="1" />
 						<label>Count</label>
-						<input type="number" name="post.requestMany/count" defaultValue="10" disabled={!initialised}></input>
+						<input type="number" name="post.requestMany/count" defaultValue="10" />
 						<label>Page</label>
-						<input type="number" name="post.requestMany/page" defaultValue="0" disabled={!initialised}></input>
-						<button onClick={() => client.post.requestMany(parseToObject("post.requestMany"))} disabled={!initialised}>Request many posts</button>
+						<input type="number" name="post.requestMany/page" defaultValue="0" />
+						<button
+							disabled={!initialised}
+							onClick={() => client.post.requestMany(parseToObject("post.requestMany"))}
+						>
+							Request many posts
+						</button>
 					</Widget>
 					<Widget>
 						<label>Post ID</label>
-						<input type="number" name="post.request/postId" defaultValue="1" disabled={!initialised}></input>
+						<input type="number" name="post.request/postId" defaultValue="1" />
 						<label>Board name</label>
-						<input type="text" name="post.request/boardName" defaultValue="test" disabled={!initialised}></input>
+						<input type="text" name="post.request/boardName" defaultValue="test" />
 						<label>Post number</label>
-						<input type="number" name="post.request/postNumber" defaultValue="1" disabled={!initialised}></input>
-						<button onClick={() => client.post.request(parseToObject("post.request"))} disabled={!initialised}>Request post</button>
+						<input type="number" name="post.request/postNumber" defaultValue="1" />
+						<button
+							disabled={!initialised}
+							onClick={() => client.post.request(parseToObject("post.request"))}
+						>
+							Request post
+						</button>
 					</Widget>
 					<Widget>
 						<label>Post ID</label>
-						<input type="number" name="post.delete/postId" defaultValue="1" disabled={!initialised}></input>
+						<input type="number" name="post.delete/postId" defaultValue="1" />
 						<label>Board name</label>
-						<input type="text" name="post.delete/boardName" defaultValue="test" disabled={!initialised}></input>
+						<input type="text" name="post.delete/boardName" defaultValue="test" />
 						<label>Post number</label>
-						<input type="number" name="post.delete/postNumber" defaultValue="1" disabled={!initialised}></input>
-						<button onClick={() => client.post.delete(parseToObject("post.delete"))} disabled={!initialised}>Delete post</button>
+						<input type="number" name="post.delete/postNumber" defaultValue="1" />
+						<button
+							disabled={!initialised}
+							onClick={() => client.post.delete(parseToObject("post.delete"))}
+						>
+							Delete post
+						</button>
 					</Widget>
 					<Widget>
 						<label>Query</label>
-						<input type="text" name="post.findMany/query" defaultValue="foxtan" disabled={!initialised}></input>
+						<input type="text" name="post.findMany/query" defaultValue="foxtan" />
 						<label>Board name</label>
-						<input type="text" name="post.findMany/boardName" defaultValue="test" disabled={!initialised}></input>
+						<input type="text" name="post.findMany/boardName" defaultValue="test" />
 						<label>Thread number</label>
-						<input type="number" name="post.findMany/threadNumber" defaultValue="1" disabled={!initialised}></input>
+						<input type="number" name="post.findMany/threadNumber" defaultValue="1" />
 						<label>Thread ID</label>
-						<input type="number" name="post.findMany/threadId" defaultValue="1" disabled={!initialised}></input>
+						<input type="number" name="post.findMany/threadId" defaultValue="1" />
 						<label>After</label>
-						<input type="date" name="post.findMany/after" defaultValue="0" disabled={!initialised}></input>
+						<input type="date" name="post.findMany/after" defaultValue="0" />
 						<label>Before</label>
-						<input type="date" name="post.findMany/before" defaultValue="0" disabled={!initialised}></input>
+						<input type="date" name="post.findMany/before" defaultValue="0" />
 						<label>Search only in subjects</label>
-						<input type="checkbox" name="post.findMany/limitToSubjects" disabled={!initialised}></input>
-						<button onClick={() => client.post.findMany(parseToObject("post.findMany"))} disabled={!initialised}>Find many posts</button>
+						<input type="checkbox" name="post.findMany/limitToSubjects" />
+						<button
+							disabled={!initialised}
+							onClick={() => client.post.findMany(parseToObject("post.findMany"))}
+						>
+							Find many posts
+						</button>
 					</Widget>
 				</Category>
 				<Category name="Captcha">
 					<Widget>
 						<label>Captcha image</label>
 						<img id="captchaImage" alt="Captcha" src={client?.captcha.imageURI} ref={captchaImg}></img>
-						<button onClick={refreshCaptcha} disabled={!initialised}>Refresh captcha image</button>
+						<button
+							disabled={!initialised}
+							onClick={refreshCaptcha}
+						>
+							Refresh captcha image
+						</button>
 						<label>Code</label>
-						<input type="number" name="captcha.validate/code" disabled={!initialised}></input>
-						<button onClick={() => client.captcha.validate(parseToObject("captcha.validate"))} disabled={!initialised}>Validate captcha</button>
+						<input type="number" name="captcha.validate/code" />
+						<button
+							disabled={!initialised}
+							onClick={() => client.captcha.validate(parseToObject("captcha.validate"))}
+						>
+							Validate captcha
+						</button>
 					</Widget>
 				</Category>
 			</div>

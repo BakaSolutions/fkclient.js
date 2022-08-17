@@ -5,7 +5,7 @@ export default class Client {
 	#APIServerURI: URL
 	#WSGate?: WebSocket
 	#ready: boolean = false
-	#meta: Meta = {}
+	#meta?: Meta
 	#messageHandlers: Listener[] = []
 	#reconnectDelay: number
 	#reconnectInterval?: number
@@ -71,7 +71,7 @@ export default class Client {
 		return this.#ready
 	}
 
-	get meta(): Meta {
+	get meta(): Meta | undefined {
 		return this.#meta
 	}
 
@@ -79,7 +79,7 @@ export default class Client {
 		return this.#APIServerURI
 	}
 
-	#handleMessage(data: InMessage | OutMessage) {
+	#handleMessage(data: InMessage<any> | OutMessage) {
 		this.#messageHandlers.forEach(([filter, callback]) => {
 			if (filter(data) === true) {
 				callback(data)
@@ -88,13 +88,13 @@ export default class Client {
 	}
 
 	addListener(
-		filter: (arg0: InMessage | OutMessage) => boolean,
-		callback: (arg0: InMessage | OutMessage) => any
+		filter: (arg0: InMessage<any> | OutMessage) => boolean,
+		callback: (arg0: InMessage<any> | OutMessage) => any
 	) {
 		this.#messageHandlers.push([filter, callback])
 	}
 
-	removeListener(filter: (arg0: InMessage | OutMessage) => boolean) {
+	removeListener(filter: (arg0: InMessage<any> | OutMessage) => boolean) {
 		this.#messageHandlers = this.#messageHandlers.filter(
 			(handler) => handler[0] !== filter
 		)
@@ -119,8 +119,10 @@ export default class Client {
 	async http(
 		method: string,
 		path: string,
-		body: FormData | null
+		body: FormData | object | null
 	): Promise<object> {
+		const isFormData = body instanceof FormData
+
 		const options: RequestInit = {
 			method: method,
 			mode: "cors",
@@ -128,12 +130,20 @@ export default class Client {
 			headers: {
 				"X-Requested-With": "XMLHttpRequest",
 			},
-			body: method === "HEAD" || method === "GET" ? null : body,
+			body: !/head|get/i.test(method)
+				? isFormData
+					? body
+					: JSON.stringify(body)
+				: null,
 		}
 
 		this.#handleMessage({
 			request: path,
-			data: body ? formDataToObject(body) : undefined,
+			data: body
+				? isFormData
+					? formDataToObject(body)
+					: body
+				: undefined,
 		})
 
 		return fetch(`${this.#APIServerURI.href}api/${path}`, options)
@@ -151,7 +161,11 @@ export default class Client {
 				this.#handleMessage({
 					what: {
 						request: path,
-						...(body ? formDataToObject(body) : {}),
+						...(body
+							? isFormData
+								? formDataToObject(body)
+								: body
+							: {}),
 					},
 					data: dataWithoutError,
 					error: data.error,
