@@ -1,9 +1,9 @@
 import { parseParam, parseToObject } from "./utils/index.js"
 import { useState, createRef } from "react"
-import Category from "./components/Category.jsx"
-import FKClient from "@bakaso/fkclient"
-import LogScreen from "./components/LogScreen.jsx"
-import Widget from "./components/Widget.jsx"
+import Category from "./components/Category"
+import FKClient from "../../dist/FKClient"
+import LogScreen from "./components/LogScreen"
+import Widget from "./components/Widget"
 
 let client = undefined
 let counter = 0
