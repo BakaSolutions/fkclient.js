@@ -14,38 +14,20 @@ export default class Client {
 		this.#APIServerURI = new URL(uri)
 		this.#reconnectDelay = reconnectDelay
 
+		// Automatically reconnect whenever metadata is received
 		this.addListener(
 			(message) => "what" in message && message.data?.ws !== undefined,
 			(message) => {
 				this.#meta = { ...this.#meta, ...message.data }
-				if (this.#WSGate !== undefined) {
-					this.#WSGate.close()
-				}
-				this.#WSGate = new WebSocket(
-					(message as InMessage<Meta>).data.ws
-				)
-
-				this.#WSGate.onopen = () => (this.#ready = true)
-				this.#WSGate.onclose = (event) => {
-					this.#ready = false
-
-					if (event.wasClean === false && this.#reconnectDelay > 0) {
-						this.reconnect()
-					}
-				}
-				window.onbeforeunload = () => this.#WSGate?.close()
-
-				this.#WSGate.addEventListener("message", (message) => {
-					this.#handleMessage(JSON.parse(message.data))
-				})
+				this.reconnect()
 			}
 		)
 
-		this.reconnect()
+		this.#requestMeta()
 	}
 
-	reconnect(client: Client = this): void {
-		client
+	async #requestMeta(client: Client = this): Promise<void> {
+		return client
 			.http("GET", "meta", null)
 			.then(() => {
 				window.clearInterval(client.#reconnectInterval)
@@ -53,18 +35,47 @@ export default class Client {
 			})
 			.catch((error) => {
 				if (
-					client.#reconnectDelay > 0 &&
-					client.#reconnectInterval === undefined
+					0 < client.#reconnectDelay &&
+					undefined === client.#reconnectInterval
 				) {
 					client.#reconnectInterval = window.setInterval(
-						client.reconnect,
+						client.#requestMeta,
 						client.#reconnectDelay,
 						client
 					)
 				}
 
-				throw `Couldn't reconnect: fetch request failed with status code ${error}`
+				throw `Couldn't fetch server metadata: request failed with status code ${error}`
 			})
+	}
+
+	reconnect(): void {
+		// If metadata is missing, request it instead of reconnecting
+		// Reconnection will be called automatically once it's fetched
+		if (undefined === this.#meta) {
+			this.#requestMeta()
+			return
+		}
+
+		if (this.#WSGate !== undefined) {
+			this.#WSGate.close()
+		}
+
+		this.#WSGate = new WebSocket(this.#meta.ws)
+
+		this.#WSGate.onopen = () => (this.#ready = true)
+		this.#WSGate.onclose = (event) => {
+			this.#ready = false
+
+			if (event.wasClean === false && this.#reconnectDelay > 0) {
+				this.reconnect()
+			}
+		}
+		window.onbeforeunload = () => this.#WSGate?.close()
+
+		this.#WSGate.addEventListener("message", (message) => {
+			this.#handleMessage(JSON.parse(message.data))
+		})
 	}
 
 	get ready(): boolean {
