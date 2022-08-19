@@ -22,7 +22,7 @@ export default class Client {
 					this.#WSGate.close()
 				}
 				this.#WSGate = new WebSocket(
-					(message as { data: { ws: string } }).data.ws
+					(message as InMessage<Meta>).data.ws
 				)
 
 				this.#WSGate.onopen = () => (this.#ready = true)

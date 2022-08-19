@@ -5,19 +5,22 @@ import Client from "./Client"
 import Post from "./Post"
 import Thread from "./Thread"
 import type { InMessage, OutMessage } from "./types"
+import Users from "./Users"
 
 export default class FKClient {
 	#client: Client
 
-	#auth?: Auth
-	#board?: Board
-	#captcha?: Captcha
-	#post?: Post
-	#thread?: Thread
+	#auth: Auth
+	#board: Board
+	#captcha: Captcha
+	#post: Post
+	#thread: Thread
+	#users: Users
 
 	constructor(uri: string, reconnectDelay: number) {
 		this.#client = new Client(uri, reconnectDelay)
 
+		this.#users = new Users(this.#client)
 		this.#auth = new Auth(this.#client)
 		this.#board = new Board(this.#client)
 		this.#captcha = new Captcha(this.#client)
@@ -73,6 +76,10 @@ export default class FKClient {
 		return this.#board
 	}
 
+	get captcha() {
+		return this.#captcha
+	}
+
 	get thread() {
 		return this.#thread
 	}
@@ -81,7 +88,7 @@ export default class FKClient {
 		return this.#post
 	}
 
-	get captcha() {
-		return this.#captcha
+	get users() {
+		return this.#users
 	}
 }
