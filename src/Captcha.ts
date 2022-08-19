@@ -8,13 +8,19 @@ export default class Captcha {
 	}
 
 	get imageURI() {
-		return `${this.client.APIServerURI.href}api/captcha?image&timestamp=${+new Date()}`
+		return (
+			this.client.APIServerURI.href +
+			"api/captcha?image&timestamp=" +
+			Number(new Date())
+		)
 	}
 
 	validate({ code }: { code: string }) {
 		const formData = new FormData()
 		formData.append("code", code)
 
-		this.client.http("POST", "checkCaptcha", formData)
+		this.client.http("POST", "checkCaptcha", formData).then(() => {
+			this.client.reconnect()
+		})
 	}
 }
