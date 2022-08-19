@@ -25,11 +25,15 @@ export default class Auth {
 		email && formData.append("email", email)
 		formData.append("password", password)
 
-		this.client.http("POST", "logOn", formData)
+		this.client.http("POST", "logOn", formData).then(() => {
+			this.client.reconnect()
+		})
 	}
 
 	logOff() {
-		this.client.http("POST", "logOff", null)
+		this.client.http("POST", "logOff", null).then(() => {
+			this.client.reconnect()
+		})
 	}
 
 	whoAmI() {
