@@ -1,7 +1,5 @@
-export default function Widget({ children }) {
+export default function Widget(params) {
 	return (
-		<div className="widget">
-			{ children }
-		</div>
+		<div className="widget" {...params} />
 	)
 }

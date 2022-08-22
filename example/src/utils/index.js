@@ -46,7 +46,7 @@ export function parseToObject(domain) {
 
 			obj.attachments = []
 			for (let i = 0; i < attachments.length; i += 2) {
-				obj.attachments.push({file: getInputValue(attachments[i]), spoiler: getInputValue(attachments[i + 1])})
+				obj.attachments.push({ file: getInputValue(attachments[i]), spoiler: getInputValue(attachments[i + 1]) })
 			}
 		}
 	}
