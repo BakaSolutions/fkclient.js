@@ -18,22 +18,38 @@
 		"url": "https://github.com/BakaSolutions/fkclient.js.git"
 	},
 	"main": "dist/FKClient.js",
-	"typings": "dist/FKClient.d.ts",
+	"typings": "dist/lib/FKClient.d.ts",
 	"files": [
 		"dist/*"
 	],
 	"scripts": {
 		"build": "webpack",
-		"install-example": "yarn --cwd example install",
-		"serve-example": "yarn --cwd example serve"
+		"dev": "react-scripts start"
 	},
 	"author": "man90 <man90@tuta.io> (https://github.com/octoman90)",
 	"license": "GPL-3.0",
 	"devDependencies": {
+		"@babel/core": ">=7.0.0-0 <8.0.0",
+		"@babel/plugin-syntax-flow": "^7.14.5",
+		"@babel/plugin-transform-react-jsx": "^7.14.9",
 		"@types/node": "^15.12.4",
+		"react": "^17.0.2",
+		"react-dom": "^17.0.2",
+		"react-scripts": "5.0.1",
+		"sakura.css": "^1.3.1",
 		"ts-loader": "^9.2.3",
 		"typescript": "^4.3.5",
 		"webpack": "^5.44.0",
 		"webpack-cli": "^4.7.2"
-	}
+	},
+	"eslintConfig": {
+		"extends": [
+			"react-app"
+		]
+	},
+	"browserslist": [
+		"last 1 chrome version",
+		"last 1 firefox version",
+		"last 1 safari version"
+	]
 }

@@ -1,8 +1,8 @@
-const path = require('path');
+const path = require("path")
 
 module.exports = {
 	mode: "production",
-	entry: "./src/FKClient.ts",
+	entry: "./src/lib/FKClient.ts",
 	output: {
 		path: path.resolve(__dirname, "./dist"),
 		filename: "FKClient.js",
@@ -22,4 +22,4 @@ module.exports = {
 			}
 		]
 	}
-};
+}
