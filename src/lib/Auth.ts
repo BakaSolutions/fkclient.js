@@ -75,6 +75,6 @@ export default class Auth {
 	}
 
 	whoAmI() {
-		this.client.http("get", "whoAmI", null)
+		this.client.ws({ request: "whoami" })
 	}
 }
