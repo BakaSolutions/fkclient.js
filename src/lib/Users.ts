@@ -9,7 +9,7 @@ export default class Users {
 
 	getInviteCode({ groupName }: { groupName: string }) {
 		if (!groupName) {
-			throw "groupName should be specified"
+			throw new Error("groupName should be specified")
 		}
 
 		this.client.ws({ request: "invite", groupName })

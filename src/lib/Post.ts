@@ -7,29 +7,79 @@ export default class Post {
 		this.client = client
 	}
 
-	request({ postId, boardName, postNumber }: { postId?: number, boardName?: string, postNumber?: number }) {
+	request({
+		postId,
+		boardName,
+		postNumber,
+	}: {
+		postId?: number
+		boardName?: string
+		postNumber?: number
+	}) {
 		if (postId) {
 			this.client.ws({ request: "post", id: postId })
 		} else if (boardName && postNumber) {
 			this.client.ws({ request: "post", boardName, number: postNumber })
 		} else {
-			throw "Either (postId) or (boardName and postNumber) should be specified"
+			throw new Error(
+				"Either postId or (boardName and postNumber) should be specified"
+			)
 		}
 	}
 
-	requestMany({ boardName, headNumber, threadId, count = 10, page = 0 }: { boardName?: string, headNumber?: number, threadId?: number, count?: number, page?: number }) {
+	requestMany({
+		boardName,
+		headNumber,
+		threadId,
+		count = 10,
+		page = 0,
+	}: {
+		boardName?: string
+		headNumber?: number
+		threadId?: number
+		count?: number
+		page?: number
+	}) {
 		if (boardName && headNumber) {
-			this.client.ws({ request: "posts", boardName, threadNumber: headNumber, count, page })
+			this.client.ws({
+				request: "posts",
+				boardName,
+				threadNumber: headNumber,
+				count,
+				page,
+			})
 		} else if (boardName) {
 			this.client.ws({ request: "posts", boardName, count, page })
 		} else if (threadId) {
 			this.client.ws({ request: "posts", threadId, count, page })
 		} else {
-			throw "Either (boardName) or (boardName and headNumber) or (threadId) should be specified"
+			throw new Error(
+				"Either boardName or (boardName and headNumber) or (threadId) should be specified"
+			)
 		}
 	}
 
-	create({ threadId, boardName, headNumber, sage, signed, op, subject, text, attachments }: { threadId?: number, boardName: string, headNumber: number, sage?: boolean, signed?: boolean, op?: boolean, subject?: string, text?:string, attachments?: {file: File, spoiler?: boolean}[] }) {
+	create({
+		threadId,
+		boardName,
+		headNumber,
+		sage,
+		signed,
+		op,
+		subject,
+		text,
+		attachments,
+	}: {
+		threadId?: number
+		boardName: string
+		headNumber: number
+		sage?: boolean
+		signed?: boolean
+		op?: boolean
+		subject?: string
+		text?: string
+		attachments?: { file: File; spoiler?: boolean }[]
+	}) {
 		let formData = new FormData()
 
 		if (threadId) {
@@ -40,7 +90,9 @@ export default class Post {
 		} else if (boardName) {
 			formData.append("boardName", boardName)
 		} else {
-			throw "Either (boardName) or (threadId) or (boardName and headNumber) should be specified"
+			throw new Error(
+				"Either boardName or (boardName and headNumber) or threadId should be specified"
+			)
 		}
 
 		if (sage) {
@@ -76,24 +128,44 @@ export default class Post {
 		this.client.http("POST", "createPost", formData)
 	}
 
-	findMany({ query, parameters }: { query: string, parameters: { boardName?: string, threadNumber?: number, threadId?: number, after?: Date, before?: Date, limitToSubjects?: boolean }}) {
+	findMany({
+		query,
+		parameters,
+	}: {
+		query: string
+		parameters: {
+			boardName?: string
+			threadNumber?: number
+			threadId?: number
+			after?: Date
+			before?: Date
+			limitToSubjects?: boolean
+		}
+	}) {
 		this.client.ws({ request: "search", query, parameters })
 	}
 
-	delete(id: { postId: number, boardName: string, postNumber: number }) {
+	delete(id: { postId: number; boardName: string; postNumber: number }) {
 		this.deleteMany([id])
 	}
 
-	deleteMany(ids: { postId: number, boardName: string, postNumber: number }[]) {
+	deleteMany(
+		ids: { postId: number; boardName: string; postNumber: number }[]
+	) {
 		const formData = new FormData()
 
 		ids.forEach((id) => {
 			if (id.postId) {
 				formData.append(`selectedPost:${id.postId}`, "true")
 			} else if (id.boardName && id.postNumber) {
-				formData.append(`selectedPost:${id.boardName}:${id.postNumber}`, "true")
+				formData.append(
+					`selectedPost:${id.boardName}:${id.postNumber}`,
+					"true"
+				)
 			} else {
-				throw "Either (postId) or (boardName and postNumber) should be specified"
+				throw new Error(
+					"Either postId or (boardName and postNumber) should be specified"
+				)
 			}
 		})
 

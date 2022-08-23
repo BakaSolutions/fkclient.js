@@ -7,21 +7,39 @@ export default class Thread {
 		this.client = client
 	}
 
-	request({ threadId, boardName, headNumber }: { threadId?: number, boardName?: string, headNumber?: number }) {
+	request({
+		threadId,
+		boardName,
+		headNumber,
+	}: {
+		threadId?: number
+		boardName?: string
+		headNumber?: number
+	}) {
 		if (threadId) {
 			this.client.ws({ request: "thread", id: threadId })
 		} else if (boardName && headNumber) {
 			this.client.ws({ request: "thread", boardName, number: headNumber })
 		} else {
-			throw "Either (threadId) or (boardName and headNumber) should be specified"
+			throw new Error(
+				"Either threadId or (boardName and headNumber) should be specified"
+			)
 		}
 	}
 
-	requestMany({ boardName, count = 10, page = 0 }: { boardName: string, count?: number, page?: number }) {
+	requestMany({
+		boardName,
+		count = 10,
+		page = 0,
+	}: {
+		boardName: string
+		count?: number
+		page?: number
+	}) {
 		if (boardName) {
 			this.client.ws({ request: "threads", boardName, count, page })
 		} else {
-			throw "(boardName) should be specified"
+			throw new Error("boardName should be specified")
 		}
 	}
 }

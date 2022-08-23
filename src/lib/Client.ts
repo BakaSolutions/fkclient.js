@@ -45,7 +45,9 @@ export default class Client {
 					)
 				}
 
-				throw `Couldn't fetch server metadata: request failed with status code ${error}`
+				throw new Error(
+					`Couldn't fetch server metadata: request failed with status code ${error}`
+				)
 			})
 	}
 
@@ -160,7 +162,9 @@ export default class Client {
 		return fetch(`${this.#APIServerURI.href}api/${path}`, options)
 			.then((response) => {
 				if (!response.ok) {
-					throw `${response.status}: ${response.statusText}`
+					throw new Error(
+						`${response.status}: ${response.statusText}`
+					)
 				}
 
 				return response.json()

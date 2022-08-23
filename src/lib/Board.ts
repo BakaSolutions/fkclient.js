@@ -11,7 +11,7 @@ export default class Board {
 		if (boardName) {
 			this.client.ws({ request: "board", name: boardName })
 		} else {
-			throw "(boardName) should be specified"
+			throw new Error("boardName should be specified")
 		}
 	}
 

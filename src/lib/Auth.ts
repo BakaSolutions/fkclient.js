@@ -19,15 +19,15 @@ export default class Auth {
 		password: string
 	}) {
 		if (!name && !email) {
-			throw "Either name or email should be specified"
+			throw new Error("Either name or email should be specified")
 		}
 
 		if (!invite) {
-			throw "Invite code should be specified"
+			throw new Error("invite should be specified")
 		}
 
 		if (!password) {
-			throw "Password should be specified"
+			throw new Error("password should be specified")
 		}
 
 		const formData = new FormData()
@@ -51,11 +51,11 @@ export default class Auth {
 		password: string
 	}) {
 		if (!name && !email) {
-			throw "Either name or email should be specified"
+			throw new Error("Either name or email should be specified")
 		}
 
 		if (!password) {
-			throw "Password should be specified"
+			throw new Error("password should be specified")
 		}
 
 		const formData = new FormData()
