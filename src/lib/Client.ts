@@ -3,12 +3,12 @@ import type { InMessage, Listener, Meta, OutMessage } from "./types"
 
 export default class Client {
 	#APIServerURI: URL
-	#WSGate?: WebSocket
-	#ready: boolean = false
-	#meta?: Meta
 	#messageHandlers: Listener[] = []
+	#meta?: Meta
+	#msgQueue: OutMessage[] = []
 	#reconnectDelay: number
 	#reconnectInterval?: number
+	#WSGate?: WebSocket
 
 	constructor(uri: string, reconnectDelay: number = 0) {
 		this.#APIServerURI = new URL(uri)
@@ -34,10 +34,7 @@ export default class Client {
 				client.#reconnectInterval = undefined
 			})
 			.catch((error) => {
-				if (
-					0 < client.#reconnectDelay &&
-					undefined === client.#reconnectInterval
-				) {
+				if (0 < client.#reconnectDelay && undefined === client.#reconnectInterval) {
 					client.#reconnectInterval = window.setInterval(
 						client.#requestMeta,
 						client.#reconnectDelay,
@@ -65,14 +62,19 @@ export default class Client {
 
 		this.#WSGate = new WebSocket(this.#meta.ws)
 
-		this.#WSGate.onopen = () => (this.#ready = true)
-		this.#WSGate.onclose = (event) => {
-			this.#ready = false
+		this.#WSGate.onopen = () => {
+			// Send all messages enqueued before the connection was open
+			const q = [...this.#msgQueue]
+			this.#msgQueue.length = 0
+			q.forEach(req => this.ws(req))
+		}
 
+		this.#WSGate.onclose = (event) => {
 			if (event.wasClean === false && this.#reconnectDelay > 0) {
 				this.reconnect()
 			}
 		}
+
 		window.onbeforeunload = () => this.#WSGate?.close()
 
 		this.#WSGate.addEventListener("message", (message) => {
@@ -81,7 +83,7 @@ export default class Client {
 	}
 
 	get ready(): boolean {
-		return this.#ready
+		return 1 === this.#WSGate?.readyState
 	}
 
 	get meta(): Meta | undefined {
@@ -114,19 +116,18 @@ export default class Client {
 	}
 
 	ws(req: OutMessage): void {
-		const i = setInterval(() => {
-			this.#handleMessage(req)
+		// If the connection isn't ready, put the message into
+		// a queue to be sent as soon as it becomes ready
+		if (!this.ready) {
+			this.#msgQueue.push(req)
+			return
+		}
 
-			clearInterval(i)
+		// Log outbound message
+		this.#handleMessage(req)
 
-			const sendRequest = () => this.#WSGate?.send(JSON.stringify(req))
-
-			if (this.#ready) {
-				sendRequest()
-			} else {
-				this.#WSGate?.addEventListener("open", () => sendRequest())
-			}
-		}, 1e2)
+		// Send the message
+		this.#WSGate?.send(JSON.stringify(req))
 	}
 
 	async http(
