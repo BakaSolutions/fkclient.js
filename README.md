@@ -17,11 +17,11 @@ import FKClient from "@bakaso/fkclient"
 const client = new FKClient("http://127.0.0.1:6749")
 
 // Subscribe to the message types you wish to handle
-client.addListener(
+client.addInMessageListener(
 	// Filter function
-	(message) => "boards" === message.what?.request,
+	msg => "boards" === message.what.request,
 	// Handler
-	(message) => console.log("Received a reply message regarding some boards:", message.data)
+	msg => console.log("Received a reply message regarding some boards:", message.data)
 )
 
 // Make your requests
