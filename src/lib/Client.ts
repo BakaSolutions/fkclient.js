@@ -169,15 +169,7 @@ export default class Client {
 		})
 
 		return fetch(`${this.#APIServerURI.href}api/${path}`, options)
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error(
-						`${response.status}: ${response.statusText}`
-					)
-				}
-
-				return response.json()
-			})
+			.then(response => response.json())
 			.then((data) => {
 				const dataWithoutError = { ...data }
 				delete dataWithoutError.error
