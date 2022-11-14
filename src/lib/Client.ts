@@ -1,11 +1,12 @@
 import { formDataToObject } from "./utils"
-import type { InMessage, Listener, Meta, OutMessage } from "./types"
+import type { InMessage, InMessageListener, OutMessageListener, Meta, OutMessage } from "./types"
 
 export default class Client {
 	#APIServerURI: URL
-	#messageHandlers: Listener[] = []
+	#inMessageHandlers: InMessageListener[] = []
 	#meta?: Meta
 	#msgQueue: OutMessage[] = []
+	#outMessageHandlers: OutMessageListener[] = []
 	#reconnectDelay: number
 	#reconnectInterval?: number
 	#WSGate?: WebSocket
@@ -15,10 +16,10 @@ export default class Client {
 		this.#reconnectDelay = reconnectDelay
 
 		// Automatically reconnect whenever metadata is received
-		this.addListener(
-			(message) => "what" in message && message.data?.ws !== undefined,
-			(message) => {
-				this.#meta = { ...this.#meta, ...message.data }
+		this.addInMessageListener(
+			(msg: InMessage<any>) => "what" in msg && msg.data?.ws !== undefined,
+			(msg: InMessage<Meta>) => {
+				this.#meta = { ...this.#meta, ...msg.data }
 				this.reconnect()
 			}
 		)
@@ -78,7 +79,7 @@ export default class Client {
 		window.onbeforeunload = () => this.#WSGate?.close()
 
 		this.#WSGate.addEventListener("message", (message) => {
-			this.#handleMessage(JSON.parse(message.data))
+			this.#handleInMessage(JSON.parse(message.data))
 		})
 	}
 
@@ -94,25 +95,32 @@ export default class Client {
 		return this.#APIServerURI
 	}
 
-	#handleMessage(data: InMessage<any> | OutMessage) {
-		this.#messageHandlers.forEach(([filter, callback]) => {
-			if (filter(data) === true) {
-				callback(data)
-			}
+	#handleInMessage(data: InMessage<any>) {
+		this.#inMessageHandlers.forEach(([filter, callback]) => {
+			filter(data) && callback(data)
 		})
 	}
 
-	addListener(
-		filter: (arg0: InMessage<any> | OutMessage) => boolean,
-		callback: (arg0: InMessage<any> | OutMessage) => any
-	) {
-		this.#messageHandlers.push([filter, callback])
+	#handleOutMessage(data: OutMessage) {
+		this.#outMessageHandlers.forEach(([filter, callback]) => {
+			filter(data) && callback(data)
+		})
 	}
 
-	removeListener(filter: (arg0: InMessage<any> | OutMessage) => boolean) {
-		this.#messageHandlers = this.#messageHandlers.filter(
-			(handler) => handler[0] !== filter
-		)
+	addInMessageListener(filter: (arg0: InMessage<any>) => boolean, callback: (arg0: InMessage<any>) => any) {
+		this.#inMessageHandlers.push([filter, callback])
+	}
+
+	addOutMessageListener(filter: (arg0: OutMessage) => boolean, callback: (arg0: OutMessage) => any) {
+		this.#outMessageHandlers.push([filter, callback])
+	}
+
+	removeInMessageListener(filter: (arg0: InMessage<any>) => boolean) {
+		this.#inMessageHandlers = this.#inMessageHandlers.filter(h => h[0] !== filter)
+	}
+
+	removeOutMessageListener(filter: (arg0: OutMessage) => boolean) {
+		this.#outMessageHandlers = this.#outMessageHandlers.filter(h => h[0] !== filter)
 	}
 
 	ws(req: OutMessage): void {
@@ -124,7 +132,7 @@ export default class Client {
 		}
 
 		// Log outbound message
-		this.#handleMessage(req)
+		this.#handleOutMessage(req)
 
 		// Send the message
 		this.#WSGate?.send(JSON.stringify(req))
@@ -151,7 +159,7 @@ export default class Client {
 				: null,
 		}
 
-		this.#handleMessage({
+		this.#handleOutMessage({
 			request: path,
 			data: body
 				? isFormData
@@ -174,7 +182,7 @@ export default class Client {
 				const dataWithoutError = { ...data }
 				delete dataWithoutError.error
 
-				this.#handleMessage({
+				this.#handleInMessage({
 					what: {
 						request: path,
 						...(body

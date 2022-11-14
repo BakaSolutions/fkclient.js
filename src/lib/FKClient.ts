@@ -4,8 +4,9 @@ import Captcha from "./Captcha"
 import Client from "./Client"
 import Post from "./Post"
 import Thread from "./Thread"
-import type { InMessage, OutMessage } from "./types"
 import Users from "./Users"
+
+import type { InMessage, OutMessage } from "./types"
 
 export default class FKClient {
 	#client: Client
@@ -57,15 +58,20 @@ export default class FKClient {
 		return this.#client?.meta?.thumb || null
 	}
 
-	addListener(
-		filter: (arg0: InMessage<any> | OutMessage) => boolean,
-		callback: (arg0: InMessage<any> | OutMessage) => any
-	) {
-		return this.#client.addListener(filter, callback)
+	addInMessageListener(filter: (arg0: InMessage<any>) => boolean, callback: (arg0: InMessage<any>) => any) {
+		return this.#client.addInMessageListener(filter, callback)
 	}
 
-	removeListener(filter: (arg0: InMessage<any> | OutMessage) => boolean) {
-		return this.#client.removeListener(filter)
+	addOutMessageListener(filter: (arg0: OutMessage) => boolean, callback: (arg0: OutMessage) => any) {
+		return this.#client.addOutMessageListener(filter, callback)
+	}
+
+	removeInMessageListener(filter: (arg0: InMessage<any>) => boolean) {
+		return this.#client.removeInMessageListener(filter)
+	}
+
+	removeOutMessageListener(filter: (arg0: OutMessage) => boolean) {
+		return this.#client.removeOutMessageListener(filter)
 	}
 
 	get auth() {

@@ -28,9 +28,14 @@ export default function App() {
 			// The second parameter is a handler function, that decides what to do with the message
 			// The first parameter is a filter function, that decides if a message should be handled by the second parameter
 			// Here, the filter always returns true, hence all messages are handled by the provided handler
-			client.addListener(
+			client.addInMessageListener(
 				() => true,
-				message => setLog(log => [...log, { direction: message.what === undefined ? "out" : "in", id: counter++, message }])
+				message => setLog(log => [...log, { direction: "in", id: counter++, message }])
+			)
+
+			client.addOutMessageListener(
+				() => true,
+				message => setLog(log => [...log, { direction: "out", id: counter++, message }])
 			)
 
 			setInitialised(true)
