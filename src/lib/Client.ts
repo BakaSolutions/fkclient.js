@@ -97,13 +97,21 @@ export default class Client {
 
 	#handleInMessage(data: InMessage<any>) {
 		this.#inMessageHandlers.forEach(([filter, callback]) => {
-			filter(data) && callback(data)
+			try {
+				filter(data) && callback(data)
+			} catch (error) {
+				console.error(error)
+			}
 		})
 	}
 
 	#handleOutMessage(data: OutMessage) {
 		this.#outMessageHandlers.forEach(([filter, callback]) => {
-			filter(data) && callback(data)
+			try {
+				filter(data) && callback(data)
+			} catch (error) {
+				console.error(error)
+			}
 		})
 	}
 
