@@ -19,9 +19,9 @@ const client = new FKClient("http://127.0.0.1:6749")
 // Subscribe to the message types you wish to handle
 client.addInMessageListener(
 	// Filter function
-	msg => "boards" === message.what.request,
+	msg => "boards" === msg.what.request,
 	// Handler
-	msg => console.log("Received a reply message regarding some boards:", message.data)
+	msg => console.log("Received a reply message regarding some boards:", msg.data)
 )
 
 // Make your requests
