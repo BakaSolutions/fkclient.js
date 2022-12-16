@@ -20,13 +20,18 @@ jobs:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
           cache: "pnpm"
+          node-version: ${{ matrix.node-version }}
+          registry-url: "https://npm.pkg.github.com"
       - name: Install dependencies
         run: pnpm install
       - name: Build
         run: pnpm build
+      - name: Set publishing config
+        run: pnpm config set "//registry.npmjs.org/:_authToken" "${NODE_AUTH_TOKEN}"
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
       - name: Upload to npmjs.com
-        run: pnpm publish --access public
+        run: pnpm publish --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
