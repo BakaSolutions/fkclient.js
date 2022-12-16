@@ -1,6 +1,21 @@
 export type Meta = {
-	engine?: string
-	res?: { path: string }
-	thumb?: { path: string; format: string; width: number; height: number }
+	captcha: {
+		size: {
+			min: number
+			max: number
+		}
+		ttl: number
+		type: string
+	}
+	engine: string
+	res: {
+		path: string
+	}
+	thumb: {
+		format: string
+		height: number
+		path: string
+		width: number
+	}
 	ws: string
 }
