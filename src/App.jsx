@@ -62,6 +62,15 @@ export default function App() {
 						</button>
 					</Widget>
 					<Widget>
+						<label children="API address" />
+						<input type="text" name="switch/uri" defaultValue="http://127.0.0.1:6749" disabled={!initialised} />
+						<button
+							children="Switch API"
+							disabled={!initialised}
+							onClick={() => client.reconnect(parseParam("switch", "uri"))}
+						/>
+					</Widget>
+					<Widget>
 						<button
 							disabled={!initialised}
 							onClick={() => client.reconnect()}

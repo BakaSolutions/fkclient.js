@@ -49,16 +49,21 @@ export default class Client {
 			})
 	}
 
-	reconnect(): void {
+	reconnect(uri?: string): void {
+		if (undefined !== uri) {
+			this.#meta = undefined
+			this.#APIServerURI = new URL(uri)
+		}
+
+		if (this.#WSGate !== undefined) {
+			this.#WSGate.close()
+		}
+
 		// If metadata is missing, request it instead of reconnecting
 		// Reconnection will be called automatically once it's fetched
 		if (undefined === this.#meta) {
 			this.#requestMeta()
 			return
-		}
-
-		if (this.#WSGate !== undefined) {
-			this.#WSGate.close()
 		}
 
 		this.#WSGate = new WebSocket(this.#meta.ws)

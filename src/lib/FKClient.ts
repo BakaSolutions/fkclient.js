@@ -29,8 +29,8 @@ export default class FKClient {
 		this.#thread = new Thread(this.#client)
 	}
 
-	reconnect() {
-		this.#client.reconnect()
+	reconnect(uri?: string) {
+		this.#client.reconnect(uri)
 	}
 
 	get ready() {
